@@ -17,15 +17,18 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/todo-app'
     useUnifiedTopology: true
 })
 .then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+.catch(err => {
+    console.error('MongoDB connection error:', err);
+    console.error('Error details:', err.cause);
+  });
 
-app.use('./api/tasks', taskRoutes)
+app.use('/api/tasks', taskRoutes)
 
-// Error handling middleware
-// app.use((err, req, res, next) => {
-//     console.error(err.stack);
-//     res.status(500).json({ message: 'Server error', error: err.message });
-//   });
+//Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  });
 
 //Start server
 const PORT = process.env.PORT || 3000;
