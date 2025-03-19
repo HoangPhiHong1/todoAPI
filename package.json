@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+
   },
   "keywords": [],
-  "author": "",
+  "author": "Hoang Phi Hong",
   "license": "ISC",
-  "description": "",
+  "description": "RESTful API for a to-do list application with task dependencies",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
