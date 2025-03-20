@@ -5,10 +5,24 @@ const taskController = require('../controllers/taskController');
 const taskCache = require('../cache/taskCache');
 
 const validateTaskInput = [
-    body('title').notEmpty().withMessage('Title is required'),
-    body('priority').optional().isIn(['low','medium','high']).withMessage('Priority must be low, medium or high'),
-    body('status').optional().isIn(['todo', 'in-progress', 'completed']).withMessage('Status must be todo, in-progress or completed'),
-    body('dueDate').optional().isISO8601().withMessage('Invalid date format')
+    body('title')
+        .notEmpty()
+        .withMessage('Title is required'),
+
+    body('priority')
+        .optional()
+        .isIn(['low','medium','high'])
+        .withMessage('Priority must be low, medium or high'),
+
+    body('status')
+        .optional()
+        .isIn(['todo', 'in-progress', 'completed'])
+        .withMessage('Status must be todo, in-progress or completed'),
+        
+    body('dueDate')
+        .optional()
+        .isISO8601()
+        .withMessage('Invalid date format')
 ];
 
 router.post('/',validateTaskInput, taskController.createTask);

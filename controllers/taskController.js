@@ -27,25 +27,25 @@ async function detectCircularDependency(taskId, dependencyId, visited = new Set(
 }
 
 //get all dependencies of a task
-async function getAllDependencies(taskId, dependencies = new Set(), level = 0) {
+async function getAllDependencies(taskId, dependencies = new Set(), level = 0, seenIds = new Set()) {
     const task = await Task.findById(taskId).populate('dependencies');
 
     if (!task || !task.dependencies.length)
         return dependencies;
 
-    for (const dep of task.dependencies){
-        const depInfo = {
-            id: dep._id,
-            title: dep.title,
-            status: dep.status,
-            level: level + 1
-        }
-
-        //Only add if not already in the set (avoid duplications)
-        if (!Array.from(dependencies).some(d => d.id.toString() === depInfo.id.toString())){
+    for (const dep of task.dependencies) {
+        const depId = dep._id.toString();
+        if (!seenIds.has(depId)) {
+            const depInfo = { 
+                id: dep._id, 
+                title: dep.title, 
+                status: dep.status, 
+                level: level + 1 
+            };
+            
             dependencies.add(depInfo);
-            //REcursively get dependencies of this dependency
-            await getAllDependencies(dep._id, dependencies, level + 1);
+            seenIds.add(depId);
+            await getAllDependencies(dep._id, dependencies, level + 1, seenIds);
         }
     }
 
