@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {body} = require('express-validator');
 const taskController = require('../controllers/taskController');
+const taskCache = require('../cache/taskCache');
 
 const validateTaskInput = [
     body('title').notEmpty().withMessage('Title is required'),
@@ -11,8 +12,8 @@ const validateTaskInput = [
 ];
 
 router.post('/',validateTaskInput, taskController.createTask);
-router.get('/',taskController.getAllTasks);
-router.get('/:id', taskController.getTaskById);
+router.get('/', taskCache.cacheTaskList, taskController.getAllTasks);
+router.get('/:id', taskCache.cacheTask, taskController.getTaskById);
 router.put('/:id', validateTaskInput, taskController.updateTask);
 router.delete('/:id', taskController.deleteTask)
 

@@ -1,8 +1,10 @@
 const Task = require('../model/task.js');
 const {validationResult} = require('express-validator');
 const mongoose = require('mongoose')
+const cacheTask = require('../cache/taskCache.js');
 
-// Helper function to detect circular dependency
+
+//helper function to detect circular dependency
 async function detectCircularDependency(taskId, dependencyId, visited = new Set()) {
     if (taskId.toString() === dependencyId.toString())
         return true;
@@ -24,7 +26,7 @@ async function detectCircularDependency(taskId, dependencyId, visited = new Set(
     return false;
 }
 
-// Get all dependencies of a task
+//get all dependencies of a task
 async function getAllDependencies(taskId, dependencies = new Set(), level = 0) {
     const task = await Task.findById(taskId).populate('dependencies');
 
@@ -215,11 +217,12 @@ exports.updateTask = async(req, res) => {
             // If all dependencies are valid, update them
             task.dependencies = dependencies;
         }
-        await task.save()
-        res.json(task)
+        await task.save();
+        taskCache.clearTaskCache(req.params.id);
+        res.json(task);
     }
     catch (err) {
-        res.status(500).json({ message: 'Server Error', error: err.message})
+        res.status(500).json({ message: 'Server Error', error: err.message});
     }
 };
 
@@ -286,18 +289,18 @@ exports.addDependency = async (req, res) => {
     }
 };
   
-// Remove a dependency from a task
+// remove a dependency from a task
 exports.removeDependency = async (req, res) => {
     try {
         const { taskId, dependencyId } = req.params;
         
-        // Validate task exists
+        //validate task exists
         const task = await Task.findById(taskId);
         if (!task) {
             return res.status(404).json({ message: 'Task not found' });
         }
         
-        // Check if dependency exists in task
+        //check if dependency exists in task
         if (!task.dependencies.some(dep => dep.toString() === dependencyId)) {
             return res.status(400).json({ message: 'Dependency not found in this task' });
         }
@@ -314,24 +317,24 @@ exports.removeDependency = async (req, res) => {
     }
 };
   
-// Get all dependencies for a task (direct and indirect)
+//get all dependencies for a task (direct and indirect)
 exports.getAllDependencies = async (req, res) => {
     try {
         const { taskId } = req.params;
         
-        // Validate task exists
+        //validate task exists
         const task = await Task.findById(taskId);
         if (!task) {
             return res.status(404).json({ message: 'Task not found' });
         }
         
-        // Get all dependencies
+        //get all dependencies
         const dependencies = await getAllDependencies(taskId);
         
-        // Convert Set to Array and sort by level
+        //convert Set to Array and sort by level
         const dependenciesArray = Array.from(dependencies).sort((a, b) => a.level - b.level);
         
-        // Group by levels
+        //group by levels
         const dependenciesByLevel = dependenciesArray.reduce((acc, dep) => {
             if (!acc[dep.level]) acc[dep.level] = [];
             acc[dep.level].push({
