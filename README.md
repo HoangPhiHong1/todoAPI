@@ -12,7 +12,7 @@
 ## Installation
 
 1. Clone the Repo
-2. Install the dependencies: npm install 
+2. Install the dependencies: **npm install**
 > [!IMPORTANT]
 > 3. Set up environment variables:\
 >   -> Create a .env file in root directory\
@@ -24,8 +24,8 @@
 
 ## Running
 
-*Development mode*: npm run dev\
-*Production mode*: npm start 
+Development mode: **npm run dev** \
+Production mode: **npm start** 
 > [!TIP]
 > ***The API will run on http://localhost:3000 (or the PORT specified in .env)***
 
